@@ -49,7 +49,6 @@ public class Input {
             Thread.currentThread().setContextClassLoader(classLoader);
             try (ScanResult scanResult =
                          new ClassGraph()
-//                                 .verbose()             // Enable verbose logging
                                  .enableAllInfo()       // Scan classes, methods, fields, annotations
                                  .scan()) {
                 final List<SourceType<Type>> types = new ArrayList<>();
@@ -84,11 +83,6 @@ public class Input {
 
     private static List<SourceType<Type>> fromClassNamePatterns(ScanResult scanResult, List<String> classNamePatterns) {
         final List<String> allClassNames = new ArrayList<>();
-/*
-        allClassNames.addAll(scanResult.getNamesOfAllStandardClasses());
-        allClassNames.addAll(scanResult.getNamesOfAllInterfaceClasses());
-        Collections.sort(allClassNames);
-*/
         final ClassInfoList classNames = filterClassNames(scanResult.getAllClasses(), classNamePatterns);
         TypeScriptGenerator.getLogger().info(String.format("Found %d classes matching pattern.", classNames.size()));
         return fromClassNames(classNames);
@@ -105,22 +99,6 @@ public class Input {
         }
         return types;
     }
-
-/*
-    static List<Class<?>> loadClasses(ScanResult scanResult, List<String> classNames) {
-        final List<Class<?>> classes = new ArrayList<>();
-        for (String className : classNames) {
-            try {
-                final Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(className);
-                classes.add(cls);
-            } catch (ReflectiveOperationException e) {
-                TypeScriptGenerator.getLogger().error(String.format("Cannot load class '%s'", className));
-                e.printStackTrace(System.out);
-            }
-        }
-        return classes;
-    }
-*/
 
     static ClassInfoList filterClassNames(ClassInfoList classNames, List<String> globs) {
         final List<Pattern> regexps = Utils.globsToRegexps(globs);
