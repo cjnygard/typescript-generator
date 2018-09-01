@@ -80,9 +80,7 @@ public class Input {
         }
     }
 
-
     private static List<SourceType<Type>> fromClassNamePatterns(ScanResult scanResult, List<String> classNamePatterns) {
-        final List<String> allClassNames = new ArrayList<>();
         final ClassInfoList classNames = filterClassNames(scanResult.getAllClasses(), classNamePatterns);
         TypeScriptGenerator.getLogger().info(String.format("Found %d classes matching pattern.", classNames.size()));
         return fromClassNames(classNames);
