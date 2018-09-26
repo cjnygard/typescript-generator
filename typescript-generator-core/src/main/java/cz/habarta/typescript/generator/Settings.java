@@ -30,7 +30,10 @@ public class Settings {
     public String namespace = null;
     public boolean mapPackagesToNamespaces = false;
     public String umdNamespace = null;
+    public List<ModuleDependency> moduleDependencies = new ArrayList<>();
+    private LoadedModuleDependencies loadedModuleDependencies = null;
     public JsonLibrary jsonLibrary = null;
+    public Jackson2Configuration jackson2Configuration = null;
     private Predicate<String> excludeFilter = null;
     @Deprecated public boolean declarePropertiesAsOptional = false;
     public OptionalProperties optionalProperties; // default is OptionalProperties.useSpecifiedAnnotations
@@ -71,6 +74,7 @@ public class Settings {
     public List<EmitterExtension> extensions = new ArrayList<>();
     public List<Class<? extends Annotation>> includePropertyAnnotations = new ArrayList<>();
     public List<Class<? extends Annotation>> optionalAnnotations = new ArrayList<>();
+    public boolean generateInfoJson = false;
     public boolean generateNpmPackageJson = false;
     public String npmName = null;
     public String npmVersion = null;
@@ -194,6 +198,9 @@ public class Settings {
         if (jsonLibrary == null) {
             throw new RuntimeException("Required 'jsonLibrary' parameter is not configured.");
         }
+        if (jackson2Configuration != null && jsonLibrary != JsonLibrary.jackson2) {
+            throw new RuntimeException("'jackson2Configuration' parameter is only applicable to 'jackson2' library.");
+        }
         for (EmitterExtension extension : extensions) {
             final String extensionName = extension.getClass().getSimpleName();
             final DeprecationText deprecation = extension.getClass().getAnnotation(DeprecationText.class);
@@ -257,6 +264,9 @@ public class Settings {
         if (restOptionsType != null && !generateJaxrs) {
             throw new RuntimeException("'restOptionsType' parameter can only be used when generating JAX-RS client or interface.");
         }
+        if (generateInfoJson && outputKind != TypeScriptOutputKind.module) {
+            throw new RuntimeException("'generateInfoJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
+        }
         if (generateNpmPackageJson && outputKind != TypeScriptOutputKind.module) {
             throw new RuntimeException("'generateNpmPackageJson' can only be used when generating proper module ('outputKind' parameter is 'module').");
         }
@@ -270,6 +280,7 @@ public class Settings {
                 throw new RuntimeException("'npmName' and 'npmVersion' is only applicable when generating NPM 'package.json'.");
             }
         }
+        getModuleDependencies();
 
         if (declarePropertiesAsOptional) {
             TypeScriptGenerator.getLogger().warning("Parameter 'declarePropertiesAsOptional' is deprecated. Use 'optionalProperties' parameter.");
@@ -307,6 +318,13 @@ public class Settings {
 
     public String getDefaultNpmVersion() {
         return "1.0.0";
+    }
+
+    public LoadedModuleDependencies getModuleDependencies() {
+        if (loadedModuleDependencies == null) {
+            loadedModuleDependencies = new LoadedModuleDependencies(this, moduleDependencies);
+        }
+        return loadedModuleDependencies;
     }
 
     public Predicate<String> getExcludeFilter() {

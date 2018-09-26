@@ -20,6 +20,7 @@ public class GenerateTask extends DefaultTask {
     public String namespace;
     public boolean mapPackagesToNamespaces;
     public String umdNamespace;
+    public List<ModuleDependency> moduleDependencies;
     public List<String> classes;
     public List<String> classPatterns;
     public List<String> classesWithAnnotations;
@@ -29,6 +30,7 @@ public class GenerateTask extends DefaultTask {
     public List<String> excludeClassPatterns;
     public List<String> includePropertyAnnotations;
     public JsonLibrary jsonLibrary;
+    public Jackson2Configuration jackson2Configuration;
     @Deprecated public boolean declarePropertiesAsOptional;
     public OptionalProperties optionalProperties;
     public OptionalPropertiesDeclaration optionalPropertiesDeclaration;
@@ -60,11 +62,13 @@ public class GenerateTask extends DefaultTask {
     public boolean sortDeclarations;
     public boolean sortTypeDeclarations;
     public boolean noFileComment;
+    public boolean noTslintDisable;
     public List<File> javadocXmlFiles;
     public List<String> extensionClasses;
     public List<String> extensions;
     public List<Settings.ConfiguredExtension> extensionsWithConfiguration;
     public List<String> optionalAnnotations;
+    public boolean generateInfoJson;
     public boolean generateNpmPackageJson;
     public String npmName;
     public String npmVersion;
@@ -116,8 +120,10 @@ public class GenerateTask extends DefaultTask {
         settings.namespace = namespace;
         settings.mapPackagesToNamespaces = mapPackagesToNamespaces;
         settings.umdNamespace = umdNamespace;
+        settings.moduleDependencies = moduleDependencies;
         settings.setExcludeFilter(excludeClasses, excludeClassPatterns);
         settings.jsonLibrary = jsonLibrary;
+        settings.jackson2Configuration = jackson2Configuration;
         settings.declarePropertiesAsOptional = declarePropertiesAsOptional;
         settings.optionalProperties = optionalProperties;
         settings.optionalPropertiesDeclaration = optionalPropertiesDeclaration;
@@ -149,10 +155,12 @@ public class GenerateTask extends DefaultTask {
         settings.sortDeclarations = sortDeclarations;
         settings.sortTypeDeclarations = sortTypeDeclarations;
         settings.noFileComment = noFileComment;
+        settings.noTslintDisable = noTslintDisable;
         settings.javadocXmlFiles = javadocXmlFiles;
         settings.loadExtensions(classLoader, Utils.concat(extensionClasses, extensions), extensionsWithConfiguration);
         settings.loadIncludePropertyAnnotations(classLoader, includePropertyAnnotations);
         settings.loadOptionalAnnotations(classLoader, optionalAnnotations);
+        settings.generateInfoJson = generateInfoJson;
         settings.generateNpmPackageJson = generateNpmPackageJson;
         settings.npmName = npmName == null && generateNpmPackageJson ? getProject().getName() : npmName;
         settings.npmVersion = npmVersion == null && generateNpmPackageJson ? settings.getDefaultNpmVersion() : npmVersion;
